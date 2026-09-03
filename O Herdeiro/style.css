@@ -1,0 +1,316 @@
+/* Configuração Base */
+body {
+    background-color: #000; color: #fff;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100vh; margin: 0; overflow: hidden;
+}
+
+#game-container {
+    aspect-ratio: 16 / 9; 
+    width: 100vw; 
+    max-width: 177.77vh; 
+    max-height: 100vh;
+    background-color: #000; 
+    position: relative;
+    border: 2px solid #555; 
+    box-sizing: border-box; 
+    overflow: hidden;
+}
+
+/* ==================================================================
+   TELAS DE INÍCIO, FIM E LORE (MENU PROFISSIONAL)
+   ================================================================== */
+.overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 20; text-align: center; transition: opacity 1s ease;
+}
+
+#start-screen { 
+    background-image: url('midia/foto_menu.png');
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+#end-screen { background-color: rgba(0, 0, 0, 0.9); }
+.hidden-overlay { opacity: 0; pointer-events: none; }
+
+
+@keyframes moveFog {
+    0% { background-position: 0px 0px; }
+    100% { background-position: 2000px 0px; }
+}
+
+.fog-layer {
+    position: absolute; 
+    top: 0; left: 0; width: 100%; height: 120%;
+    background-image: url('midia/neblina.png'); 
+    background-size: cover;
+    background-repeat: repeat-x; 
+    opacity: 0.4; 
+    z-index: 21;
+    pointer-events: none;
+    animation: moveFog 60s linear infinite; 
+}
+
+#title-wrapper {
+    z-index: 22;
+    transition: transform 0.1s ease-out;
+    pointer-events: none;
+}
+
+.title-glow {
+    font-size: 4.5em; color: #f1c40f; font-family: 'Times New Roman', Times, serif; text-transform: uppercase;
+    text-shadow: 0 0 15px rgba(241, 196, 15, 0.6), 0 0 30px rgba(241, 196, 15, 0.4); 
+    letter-spacing: 12px; margin: 0; padding-left: 12px;
+}
+
+.subtitle { color: #e0e0e0; font-size: 1.3em; letter-spacing: 4px; margin-top: 300px; margin-bottom: 30px; font-style: italic; }
+
+.menu-intro-text {
+    z-index: 22; max-width: 45%; line-height: 1.6; color: #ddd; 
+    font-size: 1.05em; text-shadow: 2px 2px 4px rgba(0,0,0,0.9); margin-bottom: 50px;
+}
+
+.btn-start {
+    z-index: 23;
+    background-color: transparent;
+    background-image: url('midia/entrar_casa.png'); 
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none; 
+    width: 380px; 
+    height: 95px;
+    cursor: pointer; 
+    transition: transform 0.2s ease, filter 0.2s ease; 
+}
+
+.btn-start:hover { 
+    transform: scale(1.05);
+    filter: brightness(1.15); 
+}
+
+/* Configuração das Imagens de Fundo (Salas) */
+.view { 
+    width: 100%; height: 100%; position: absolute; 
+    opacity: 0; z-index: 1; transition: opacity 0.5s ease; pointer-events: none; 
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.active-view { opacity: 1; z-index: 2; pointer-events: auto; }
+
+#wall-0 { background-image: url('midia/parede1_lanterna.png'); transition: background-image 0.3s ease; } 
+#wall-1 { background-image: url('midia/2.png'); transition: background-image 0.3s ease; } 
+#wall-2 { background-image: url('midia/3.png'); } 
+#wall-3 { background-image: url('midia/4.png'); transition: background-image 0.3s ease; } 
+#wall-4 { background-image: url('midia/5.png'); } 
+
+/* ==================================================================
+   UI, INVENTÁRIO E ÁUDIO
+   ================================================================== */
+#ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: none; flex-direction: column; justify-content: space-between; z-index: 5; }
+
+#btn-audio {
+    position: absolute; top: 20px; right: 20px; z-index: 50;
+    background: rgba(0, 0, 0, 0.7); border: 2px solid #bdc3c7; border-radius: 50%;
+    color: white; font-size: 24px; width: 50px; height: 50px;
+    cursor: pointer; pointer-events: auto; transition: 0.3s;
+    display: flex; justify-content: center; align-items: center;
+}
+#btn-audio:hover { background: #deff9a; border-color: #deff9a; color: #000; }
+
+#inventory-bar { 
+    background-color: rgba(0, 0, 0, 0.85); padding: 10px 20px; min-height: 80px; 
+    display: flex; gap: 15px; flex-wrap: wrap; pointer-events: auto; 
+    border-bottom: 2px solid #7f8c8d; align-items: center; 
+}
+
+.inventory-item { 
+    width: 65px; height: 65px; background-color: #34495e; 
+    border-radius: 8px; cursor: pointer; border: 2px solid transparent; 
+    transition: 0.2s; user-select: none; position: relative;
+    background-size: 80%; background-repeat: no-repeat; background-position: center;
+}
+.inventory-item:hover { background-color: #7f8c8d; border-color: #ecf0f1; }
+.selected-item { border: 2px solid #f1c40f; background-color: #2980b9; box-shadow: 0 0 15px rgba(241,196,15,0.6); }
+
+.inventory-item::after {
+    content: attr(data-name);
+    position: absolute; top: 110%; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.9); color: #fff; padding: 6px 12px; border-radius: 5px;
+    font-size: 14px; white-space: nowrap; opacity: 0; pointer-events: none; transition: 0.2s;
+    border: 1px solid #bdc3c7; font-family: 'Courier New', Courier, monospace; z-index: 100;
+}
+.inventory-item:hover::after { opacity: 1; }
+
+.nav-btn-ceiling {
+    position: absolute; 
+    top: 100px; left: 50%; transform: translateX(-50%); 
+    z-index: 10; width: 320px; height: 60px;
+    background-color: transparent; border: none; cursor: pointer; pointer-events: auto;
+    background-image: url('midia/olhar_teto.png'); background-size: contain; background-repeat: no-repeat; background-position: center;
+    transition: transform 0.2s ease;
+}
+
+.nav-btn-ceiling:hover { transform: translateX(-50%) scale(1.05); }
+
+#nav-buttons { 
+    display: flex; justify-content: space-between; padding: 20px 40px; pointer-events: none; 
+}
+
+button.nav-btn { 
+    width: 260px; height: 60px; background-color: transparent; border: none; cursor: pointer; transition: transform 0.2s ease; pointer-events: auto;
+    background-size: contain; background-repeat: no-repeat; background-position: center;
+}
+
+button.nav-btn:hover { transform: scale(1.05); }
+#btn-esquerda { background-image: url('midia/olhar_esquerda.png'); }
+#btn-direita { background-image: url('midia/olhar_direita.png'); }
+
+#dialogue-box { 
+    position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); width: 80%; 
+    background-color: rgba(0, 0, 0, 0.95); color: #ecf0f1; padding: 20px; box-sizing: border-box; 
+    border: 2px solid #ecf0f1; display: none; z-index: 30; cursor: pointer; pointer-events: auto; 
+    font-size: 1.2em; line-height: 1.5; white-space: pre-wrap; box-shadow: 0 0 20px rgba(0,0,0,0.8);
+}
+
+/* ==================================================================
+   HITBOXES DA SALA
+   ================================================================== */
+.clickable { 
+    position: absolute; cursor: pointer; border: none; background: transparent; transition: background-color 0.2s;
+}
+.clickable:hover { background-color: rgba(255, 255, 255, 0.1); border-radius: 5px; }
+
+#estante-cofre { width: 48%; height: 61%; top: 19%; left: 25%; }
+#cofre { width: 8%; height: 8%; top: 41.5%; left: 45.5%; }
+#lanterna-vazia { width: 4%; height: 6%; top: 56%; left: 28%; } 
+#diario-lore { width: 4%; height: 8%; top: 25%; left: 65%; } 
+
+#janela { width: 24%; height: 32%; top: 18%; left: 38%; }
+#caixa-trancada { width: 7%; height: 10%; top: 58%; left: 7.5%; } 
+#mesa-cabeceira { width: 14%; height: 26%; top: 61%; left: 71%; }
+#gaveta { width: 12%; height: 9%; top: 70%; left: 73%; }
+#livro-formulas { width: 4%; height: 7%; top: 62%; left: 73.5%; } 
+#caixa-vidro { width: 7%; height: 12%; top: 76%; left: 86%; } 
+
+#estante-sec { width: 30%; height: 72%; top: 13%; left: 2%; }
+#quadro-carro { width: 29%; height: 37%; top: 7%; left: 63%; text-align: center; font-weight: bold; color: transparent; display: flex; align-items: center; justify-content: center;}
+#tapete { width: 42%; height: 12%; top: 88%; left: 29%; }
+#chave-chao { width: 7%; height: 7%; top: 92%; left: 48%; display: none; z-index: 10;   background-image: url('midia/pedaco_chave1.png'); background-repeat: no-repeat; }
+
+#porta-saida { width: 20%; height: 66%; top: 13%; left: 8%; }
+#sofa { width: 56%; height: 34%; top: 53%; left: 41%; }
+#almofada { width: 8%; height: 12%; top: 59%; left: 79%; } 
+
+#lampada { width: 8%; height: 12%; top: 44%; left: 46%; border-radius: 50%; }
+
+/* ==================================================================
+   SISTEMA DE ZOOM NO COFRE E ITENS (EXAMINE VIEW)
+   ================================================================== */
+#examine-container {
+    position: relative; width: 80vw; max-width: 800px; aspect-ratio: 16/9;
+    background-size: contain; background-repeat: no-repeat; background-position: center;
+}
+
+#examine-display {
+    position: absolute; color: #2ecc71; font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 2.5em;
+    display: flex; align-items: center; justify-content: center; letter-spacing: 5px; background-color: transparent; z-index: 30; pointer-events: none;
+}
+
+#examine-keypad {
+    position: absolute; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); gap: 4%; z-index: 35; 
+}
+
+.key {
+    cursor: pointer; pointer-events: auto; background-color: rgba(255, 255, 255, 0.01); 
+}
+
+.empty-key { pointer-events: none; background-color: transparent; border: none;}
+.key:hover { background-color: rgba(255,255,255,0.2); }
+
+.layout-cinza #examine-display { top: 25%; left: 55%; width: 23%; height: 9%; }
+.layout-cinza #examine-keypad { top: 35%; left: 57%; width: 17%; height: 39%; }
+
+.layout-vermelho #examine-display { top: 22.5%; left: 32%; width: 36%; height: 10%; color: #e74c3c; }
+.layout-vermelho #examine-keypad { top: 35.5%; left: 40%; width: 17%; height: 39%; }
+
+#close-examine {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); background-color: rgba(0, 0, 0, 0.85); 
+    color: #fff; border: 1px solid #deff9a; border-radius: 5px; padding: 12px 35px; font-size: 1.2em; font-weight: bold; 
+    text-transform: uppercase; letter-spacing: 2px; cursor: pointer; font-family: inherit; transition: 0.3s ease; z-index: 100; pointer-events: auto; 
+}
+#close-examine:hover { background-color: #deff9a; color: #000; }
+
+#examine-text {
+    position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 750px;
+    background-color: #f4ecd8; background-image: radial-gradient(circle, #fdfbf7 0%, #e3d5b8 100%);
+    color: #2c1e16; padding: 30px 40px; border: 2px solid #5c3a21; border-radius: 4px; 
+    box-shadow: 0 15px 40px rgba(0,0,0,0.9), inset 0 0 30px rgba(92, 58, 33, 0.15);
+    font-size: 1.25em; line-height: 1.6; white-space: pre-wrap; text-align: center; z-index: 50; pointer-events: none; font-family: 'Times New Roman', Georgia, serif; 
+}
+
+/* ==================================================================
+   EFEITOS (SCREEN SHAKE, CRIATURA E FLASH)
+   ================================================================== */
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+.shake-animation { animation: shake 0.4s; animation-iteration-count: 1; }
+
+#room-transition {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: #000; z-index: 4; opacity: 0; pointer-events: none; transition: opacity 0.25s ease-in-out; 
+}
+
+#book-content { text-align: left; font-size: 1em; line-height: 1.6; }
+
+.book-page-btn {
+    background: rgba(0, 0, 0, 0.8); color: #deff9a; border: 2px solid #deff9a; border-radius: 5px;
+    padding: 10px 20px; cursor: pointer; font-family: 'Courier New', Courier, monospace; font-weight: bold; transition: all 0.2s ease; pointer-events: auto;
+}
+.book-page-btn:hover { background: #deff9a; color: #000; }
+
+.damage-flash { animation: flashRed 0.4s ease-out; }
+@keyframes flashRed {
+    0% { background-color: rgba(231, 76, 60, 0.5); }
+    100% { background-color: transparent; }
+}
+
+/* ==================================================================
+   SUSTO RELÂMPAGO
+   ================================================================== */
+#criatura-susto {
+    position: absolute;
+    bottom: 0px;       
+    left: 2%;          
+    width: 350px;      
+    height: 750px;     
+    
+    background-image: url('midia/sombra.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: bottom left;
+    
+    z-index: 15; 
+    pointer-events: none; 
+    opacity: 0; 
+}
+
+.aparecer-bicho {
+    opacity: 1 !important;
+}
