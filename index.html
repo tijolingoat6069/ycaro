@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O Herdeiro - O Mistério das Funções Exponenciais</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="game-container">
+        
+      <div id="start-screen" class="overlay">
+            <div class="fog-layer"></div>
+            
+            <div id="title-wrapper">
+                <h1 class="title-glow">O Herdeiro</h1>
+                <h2 class="subtitle"></h2>
+            </div>
+
+            <p class="menu-intro-text">
+                Seu avô trancou a herança para protegê-la. Apenas alguém que compreenda a verdadeira ligação entre o crescimento exponencial e os logaritmos será digno de abrir o cofre.
+            </p>
+            <button class="btn-start" onclick="iniciarJogo()"></button>
+        </div>
+
+        <div id="prologue-screen" class="overlay hidden-overlay" style="background-color: #050505; z-index: 18;">
+            <div style="max-width: 600px; text-align: justify; color: #bdc3c7; font-size: 1.2em; line-height: 1.8; font-family: 'Courier New', Courier, monospace;">
+                <p style="color: #f1c40f; text-align: center; font-size: 1.5em; margin-bottom: 30px;">24 de Outubro, Leitura do Testamento</p>
+                <p>"A minha riqueza nunca esteve nos cofres dos bancos, mas na compreensão dos números que regem este mundo."</p>
+                <p>O advogado te entrega uma chave enferrujada e um sorriso nervoso. "Ele disse que o escritório está selado. Só o herdeiro que dominar a mesma lógica que ele conseguirá abrir o cofre principal antes que o sistema tranque tudo para sempre."</p>
+                <p>Você para em frente à pesada porta de madeira. É a sua vez.</p>
+            </div>
+            <button class="btn-start" style="margin-top: 50px; font-size: 1.2em;" onclick="entrarNaSala()"></button>
+        </div>
+
+        <div id="end-screen" class="overlay hidden-overlay">
+            <h1 class="title-glow" style="color: #e74c3c; text-shadow: 0 0 20px #e74c3c;">A VERDADE REVELADA</h1>
+            <div style="max-width: 700px; text-align: center; color: #ecf0f1; font-size: 1.2em; line-height: 1.6; margin-bottom: 40px; margin-top: 20px;">
+                <p>A porta se abre e você foge para a noite. Ao abrir a pasta pesada, não há escrituras de terras, nem dinheiro.</p>
+                <p>São esquemas matemáticos detalhados prevendo um colapso global. E a última anotação diz:</p>
+                <p style="color: #deff9a; font-style: italic; margin-top: 15px; font-weight: bold; font-size: 1.1em;">"A matemática é a linguagem do universo. O apocalipse não é uma lenda, é uma equação. E o resultado... começa amanhã. Boa sorte."</p>
+            </div>
+            <button class="btn-start" onclick="location.reload()"></button>
+        </div>
+
+        <div id="examine-view" class="overlay hidden-overlay" style="z-index: 25; background-color: rgba(0,0,0,0.92);">
+            <div id="examine-container">
+                <div id="examine-display"></div>
+                <div id="examine-keypad">
+                    <div class="key" onclick="digitarCofre('1')"></div>
+                    <div class="key" onclick="digitarCofre('2')"></div>
+                    <div class="key" onclick="digitarCofre('3')"></div>
+                    <div class="key" onclick="digitarCofre('4')"></div>
+                    <div class="key" onclick="digitarCofre('5')"></div>
+                    <div class="key" onclick="digitarCofre('6')"></div>
+                    <div class="key" onclick="digitarCofre('7')"></div>
+                    <div class="key" onclick="digitarCofre('8')"></div>
+                    <div class="key" onclick="digitarCofre('9')"></div>
+                    <div class="key empty-key"></div>
+                    <div class="key" onclick="digitarCofre('0')"></div>
+                    <div class="key empty-key"></div>
+                </div>
+            </div>
+            
+            <div id="book-controls" style="display: none; position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); z-index: 60; gap: 20px; align-items: center;">
+                <button class="book-page-btn" onclick="mudarPaginaTutorial(-1)">◀ Pág Anterior</button>
+                <span id="book-page-indicator" style="color: #deff9a; font-weight: bold; background: rgba(0,0,0,0.8); padding: 5px 15px; border-radius: 5px; font-family: 'Courier New', Courier, monospace;">1/2</span>
+                <button class="book-page-btn" onclick="mudarPaginaTutorial(1)">Próxima Pág ▶</button>
+            </div>
+
+            <div id="examine-text" class="hidden-element">
+                <div id="book-content"></div> 
+            </div>
+            
+            <button id="close-examine" onclick="fecharZoom()">↓ VOLTAR</button>
+        </div>
+
+        <div id="wall-0" class="view">
+            <div id="estante-cofre" class="clickable" onclick="interagir('estante-cofre')"></div>
+            <div id="cofre" class="clickable" onclick="interagir('cofre')"></div>
+            <div id="lanterna-vazia" class="clickable" onclick="interagir('lanterna-vazia')"></div>
+            <div id="diario-lore" class="clickable" onclick="interagir('diario-lore')"></div>
+        </div>
+
+        <div id="wall-1" class="view">
+            <div id="janela" class="clickable" onclick="interagir('janela')"></div>
+            <div id="caixa-vidro" class="clickable" onclick="interagir('caixa-vidro')"></div>
+            <div id="mesa-cabeceira" class="clickable" onclick="interagir('mesa-cabeceira')"></div>
+            <div id="gaveta" class="clickable" onclick="interagir('gaveta')"></div>
+            <div id="caixa-trancada" class="clickable" onclick="interagir('caixa-trancada')"></div>
+            <div id="livro-formulas" class="clickable" onclick="interagir('livro-formulas')"></div>
+        </div>
+
+        <div id="wall-2" class="view">
+            <div id="quadro-carro" class="clickable" onclick="interagir('quadro-carro')"></div>
+            <div id="estante-sec" class="clickable" onclick="interagir('estante-sec')"></div>
+            <div id="chave-chao" class="clickable" onclick="interagir('chave-chao')"></div>
+            <div id="tapete" class="clickable" onclick="interagir('tapete')"></div>
+        </div>
+
+        <div id="wall-3" class="view">
+            <div id="sofa" class="clickable" onclick="interagir('sofa')"></div>
+            <div id="almofada" class="clickable" onclick="interagir('almofada')"></div>
+            <div id="porta-saida" class="clickable" onclick="interagir('porta-saida')"></div>
+        </div>
+
+        <div id="wall-4" class="view">
+            <div id="lampada" class="clickable" onclick="interagir('lampada')"></div>
+        </div>
+
+        <div id="criatura-susto"></div>
+
+        <div id="room-transition"></div>
+
+        <div id="ui-layer">
+            <button id="btn-audio" onclick="alternarAudio()">🔊</button>
+
+            <div id="inventory-bar">
+                <span style="color:#bdc3c7; margin-right: 15px; font-size: 1.2em; font-weight: bold;">Inventário:</span>
+            </div>
+            
+            <button class="nav-btn-ceiling" onclick="olharTeto()"></button>
+
+            <div id="nav-buttons">
+                <button class="nav-btn" id="btn-esquerda" onclick="mudarParede('esquerda')"></button>
+                <button class="nav-btn" id="btn-direita" onclick="mudarParede('direita')"></button>
+            </div>
+        </div>
+
+        <div id="dialogue-box" onclick="fecharDialogo()">
+            <p id="dialogue-text"></p>
+            <small style="color: #95a5a6; font-size: 0.8em; margin-top:10px; display:block;">(Clica para fechar)</small>
+        </div>
+
+    </div> 
+    
+    <script src="script.js"></script>
+</body>
+</html>
